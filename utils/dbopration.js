@@ -1,28 +1,5 @@
-const configSql = require("./dbconfig");
+const configSql = require("../db/dbconfig");
 const sql = require("mssql");
-
-// const pool = new sql.ConnectionPool(configSql);
-
-// pool
-//   .connect()
-//   .then((pool) => {
-//     // Connection successful, you can now execute queries
-
-//     // Example query execution
-//     const request = pool.request();
-//     request
-//       .query("SELECT * FROM GlasswareOrders")
-//       .then((result) => {
-//         console.log(result.recordset);
-//       })
-//       .catch((err) => {
-//         console.error("Error executing query:", err);
-//       });
-//   })
-//   .catch((err) => {
-//     // Connection failed
-//     console.error("Error connecting to SQL Server:", err);
-//   });
 
 const getGalassWareOrders = async () => {
   try {
@@ -82,4 +59,61 @@ const addOrder = async (order) => {
   }
 };
 
-module.exports = { getGalassWareOrders, getGalassWareOrder, addOrder };
+//exec from sp
+//comapnies
+const getCompanies = async () => {
+  try {
+    let pool = await sql.connect(configSql);
+    let products = await pool.request().execute("GetCompanies");
+    return products.recordset;
+  } catch (error) {
+    console.log(error);
+  }
+};
+//customers
+const getCustomers = async () => {
+  try {
+    let pool = await sql.connect(configSql);
+    let products = await pool.request().execute("GetCustomers");
+    return products.recordset;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getCustomersOrders = async (customerCode) => {
+  try {
+    let pool = await sql.connect(configSql);
+    let result = await pool
+      .request()
+      .input("customerCode", sql.Int, customerCode)
+      .execute("GetCustomerOrders");
+    return result.recordset;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//if you want to pass params
+// const getGalassWareOrdersWithStoredProcedure = async (param1, param2) => {
+//   try {
+//     let pool = await sql.connect(configSql);
+//     let result = await pool
+//       .request()
+//       .input("Param1", sql.NVarChar, param1)
+//       .input("Param2", sql.Int, param2)
+//       .execute("YourStoredProcedureName");
+//     return result.recordset;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+module.exports = {
+  getGalassWareOrders,
+  getGalassWareOrder,
+  addOrder,
+  getCompanies,
+  getCustomers,
+  getCustomersOrders,
+};

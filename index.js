@@ -1,13 +1,18 @@
 const express = require("express");
-const configSql = require("./dbconfig");
+const configSql = require("./db/dbconfig");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const sql = require("mssql");
-const dbopration = require("./dbopration");
+const dbopration = require("./utils/dbopration");
 const router = express.Router();
+const dotenv = require("dotenv");
+
+dotenv.config();
+const { PORT } = process.env;
 
 const app = express();
 
+//express config
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -16,40 +21,30 @@ app.use("/api", router);
 
 //for authentication
 router.use((req, res, next) => {
-  console.log("middleware");
+  // console.log("middleware");
   next();
 });
 
-//get --> all the orders from table
-// router.route("/orders").get((req, res) => {
-//   dbopration.getGalassWareOrders().then((result) => {
-//     res.json(result);
-//   });
-// });
-
-// router.route("/orders/:companyCode").get((req, res) => {
-//   dbopration.getGalassWareOrder(req.params.companyCode).then((result) => {
-//     res.json(result);
-//   });
-// });
-
-//add the order and get the req.body from front add to header aplication/type content-type
-router.route("/orders").post((req, res) => {
-  let order = { ...req.body };
-  dbopration.addOrder(order).then((result) => {
-    res.status(200).json(result);
-  });
-});
+app.listen(PORT, () =>
+  console.log("server is listening on http://localhost:" + PORT)
+);
 
 const orderRoute = require("./routers/orderRoute");
 app.use("/api", orderRoute);
 
-app.listen(8080, () =>
-  console.log("server is listening on http://localhost:" + 8080)
-);
+//customer
+const customerRoute = require("./routers/customerRoute");
+app.use("/api", customerRoute);
 
-console.log(configSql);
+//companies
+const companiesRoute = require("./routers/companiesRoute");
+app.use("/api", companiesRoute);
 
+//products
+const productsRoute = require("./routers/productsRoute");
+app.use("/api", productsRoute);
+
+//db test table
 dbopration.getGalassWareOrders().then((result) => {
-  console.log(result);
+  // console.log(result);
 });

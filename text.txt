@@ -1,0 +1,80 @@
+//get --> all the orders from table
+
+
+// router.route("/orders").get((req, res) => {
+//   dbopration.getGalassWareOrders().then((result) => {
+//     res.json(result);
+//   });
+// });
+
+
+
+// router.route("/orders/:companyCode").get((req, res) => {
+//   dbopration.getGalassWareOrder(req.params.companyCode).then((result) => {
+//     res.json(result);
+//   });
+// });
+
+
+
+//add the order and get the req.body from front add to header aplication/type content-type
+
+
+// router.route("/orders").post((req, res) => {
+//   let order = { ...req.body };
+//   dbopration.addOrder(order).then((result) => {
+//     res.status(200).json(result);
+//   });
+// });
+
+// const orderRoute = require("./routers/orderRoute");
+// app.use("/api", orderRoute);
+
+
+
+
+//connected to dataBase 
+
+// const pool = new sql.ConnectionPool(configSql);
+
+// pool
+//   .connect()
+//   .then((pool) => {
+//     // Connection successful, you can now execute queries
+
+//     // Example query execution
+//     const request = pool.request();
+//     request
+//       .query("SELECT * FROM GlasswareOrders")
+//       .then((result) => {
+//         console.log(result.recordset);
+//       })
+//       .catch((err) => {
+//         console.error("Error executing query:", err);
+//       });
+//   })
+//   .catch((err) => {
+//     // Connection failed
+//     console.error("Error connecting to SQL Server:", err);
+//   });
+
+
+
+//get the value from body
+
+
+// const getGalassWareOrdersWithStoredProcedure = async (req) => {
+//   try {
+//     const { param1, param2 } = req.body; // Assuming param1 and param2 are the keys in req.body
+
+//     let pool = await sql.connect(configSql);
+//     let result = await pool
+//       .request()
+//       .input("Param1", sql.NVarChar, param1)
+//       .input("Param2", sql.Int, param2)
+//       .execute("YourStoredProcedureName");
+//     return result.recordset;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };

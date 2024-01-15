@@ -1,6 +1,6 @@
-const configSql = require("../dbconfig");
+const configSql = require("../db/dbconfig");
 const sql = require("mssql");
-const dbopration = require("../dbopration");
+const dbopration = require("../utils/dbopration");
 
 const getOrders = async (req, res) => {
   try {

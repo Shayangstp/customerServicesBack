@@ -9,6 +9,18 @@ const getCustomers = async (req, res) => {
     console.log(error);
   }
 };
+const postCustomersPerCompany = async (req, res) => {
+  let reqbody = { ...req.body };
+  try {
+    dbOpCustomers
+      .postCustomersPerCompany(reqbody.companyCode)
+      .then((result) => {
+        return res.json(result);
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const postCustomersOrders = async (req, res) => {
   //40114
@@ -92,4 +104,5 @@ module.exports = {
   postExportCustomersPerCompany,
   getLocalCustomers,
   postLocalCustomersPerCompany,
+  postCustomersPerCompany,
 };

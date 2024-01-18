@@ -10,6 +10,18 @@ const getCustomers = async () => {
     console.log(error);
   }
 };
+const postCustomersPerCompany = async (companyCode) => {
+  try {
+    let pool = await sql.connect(configSql);
+    let products = await pool
+      .request()
+      .input("CompanyCode", sql.Int, companyCode)
+      .execute("GetCustomersPerCompany");
+    return products.recordset;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const postCustomersOrders = async (customerCode) => {
   try {
@@ -91,4 +103,5 @@ module.exports = {
   postExportCustomersPerCompany,
   getLocalCustomers,
   postLocalCustomersPerCompany,
+  postCustomersPerCompany,
 };

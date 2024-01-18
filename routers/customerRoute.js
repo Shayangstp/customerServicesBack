@@ -20,5 +20,9 @@ router.post(
   "/getLocalCustomersPerCompany",
   customerController.postLocalCustomersPerCompany
 );
+router.post(
+  "/getCustomersPerCompany",
+  customerController.postCustomersPerCompany
+);
 
 module.exports = router;

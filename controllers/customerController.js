@@ -28,7 +28,7 @@ const postCustomersOrders = async (req, res) => {
   let reqbody = { ...req.body };
   try {
     dbOpCustomers.postCustomersOrders(reqbody.customerCode).then((result) => {
-      return res.json(result);
+      return res.json({ code: 200, customerOrders: result });
     });
   } catch (error) {
     console.log(error);
@@ -39,13 +39,17 @@ const postCustomerOrdersPerCompany = async (req, res) => {
   //40114 customercode
   //68 companyCode
   let reqbody = { ...req.body };
-  console.log(reqbody.customerCode);
-  console.log(reqbody.companyCode);
+  console.log("customerCode", reqbody.customerCode);
+  console.log("compnayCode", reqbody.companyCode);
   try {
     dbOpCustomers
       .postCustomersOrdersPerCompany(reqbody.customerCode, reqbody.companyCode)
       .then((result) => {
-        return res.json(result);
+        if (reqbody.customerCode === "" || reqbody.companyCode === "") {
+          return res.json({ code: 401, message: "req data is empty string" });
+        } else {
+          return res.json({ code: 200, customerOrdersPerCompany: result });
+        }
       });
   } catch (error) {
     console.log(error);

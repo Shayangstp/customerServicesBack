@@ -32,6 +32,10 @@ app.listen(PORT, () =>
 const orderRoute = require("./routers/orderRoute");
 app.use("/api", orderRoute);
 
+//auth
+const authRoute = require("./routers/authRoute");
+app.use("/api", authRoute);
+
 //customer
 const customerRoute = require("./routers/customerRoute");
 app.use("/api", customerRoute);

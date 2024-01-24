@@ -4,7 +4,7 @@ const dbOpCompanies = require("../utils/dbOpCompanies");
 const getCompanies = async (req, res) => {
   try {
     dbOpCompanies.getCompanies().then((result) => {
-      return res.json(result);
+      return res.json({ code: 200, companies: result });
     });
   } catch (error) {
     console.log(error);

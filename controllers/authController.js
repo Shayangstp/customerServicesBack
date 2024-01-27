@@ -5,7 +5,11 @@ const postSignUpCustomer = async (req, res) => {
   values = {};
   try {
     dbOpAuth.signUpCustomer(req.body).then((result) => {
-      return res.json({ code: 200, message: "User signed up successfully" });
+      console.log("controller" + result);
+      if (result.code === 409) {
+        return res.json({ code: 409, message: result.message });
+      }
+      return res.json({ code: 201, message: "ثبت نام با موفقیت انجام شد" });
     });
   } catch (error) {
     console.log(error);

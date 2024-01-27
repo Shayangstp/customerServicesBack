@@ -10,6 +10,7 @@ const getCustomers = async () => {
     console.log(error);
   }
 };
+
 const postCustomersPerCompany = async (companyCode) => {
   try {
     let pool = await sql.connect(configSql);

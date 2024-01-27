@@ -81,3 +81,23 @@ shayan
 //     console.log(error);
 //   }
 // };
+
+
+//how make the table in sql 
+CREATE TABLE Users (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    codeMeli VARCHAR(20),
+    fullName VARCHAR(100),
+    phoneNumber VARCHAR(20),
+    [password] VARCHAR(50)
+);
+
+
+//http statu 
+200 get and post from api 
+201 create 
+202 accept 
+400  bad request (get the bad data)
+401 unauthorized
+403 forbidden 
+404 not found 

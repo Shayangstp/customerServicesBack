@@ -1,6 +1,7 @@
 const configSql = require("../db/dbconfig");
 const sql = require("mssql");
 
+
 const signUpCustomer = async (values) => {
   console.log(values);
   try {
@@ -58,6 +59,34 @@ const signUpCustomer = async (values) => {
   }
 };
 
+const loginCustomer = async (values) => {
+  try {
+    const pool = await sql.connect(configSql); // Replace 'config' with your SQL Server connection configuration
+    const result = await pool
+      .request()
+      .input("codeMeli", sql.VarChar(255), values.codeMeli)
+      .input("password", sql.VarChar(255), values.password)
+      .query(
+        "SELECT * FROM Users WHERE codeMeli = @codeMeli AND password = @password"
+      );
+
+    console.log(result.recordset);
+    if (result.recordset.length === 0) {
+      // Login success
+      const errorResult = {
+        code: 401,
+        message: "کد ملی یا رمز عبور اشتباه است",
+      };
+      return errorResult;
+    }
+
+    return result.recordset[0];
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 //login
 
 // app.post('/login', async (req, res) => {
@@ -83,4 +112,4 @@ const signUpCustomer = async (values) => {
 //     }
 //   });
 
-module.exports = { signUpCustomer };
+module.exports = { signUpCustomer, loginCustomer };

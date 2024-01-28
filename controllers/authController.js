@@ -1,11 +1,11 @@
 const dbOpAuth = require("../utils/dbOpAuth");
+const jwt = require("jsonwebtoken");
 
 const postSignUpCustomer = async (req, res) => {
   console.log(req.body);
   values = {};
   try {
     dbOpAuth.signUpCustomer(req.body).then((result) => {
-      console.log("controller" + result);
       if (result.code === 409) {
         return res.json({ code: 409, message: result.message });
       }
@@ -15,5 +15,24 @@ const postSignUpCustomer = async (req, res) => {
     console.log(error);
   }
 };
+const postLoginCustomer = async (req, res) => {
+  console.log(req.body);
+  try {
+    dbOpAuth.loginCustomer(req.body).then((result) => {
+      console.log(result);
+      if (result.code === 401) {
+        return res.json({ code: 401, message: result.message });
+      }
+      const token = jwt.sign(result, "shayan5262");
+      return res.json({
+        code: 415,
+        message: "ورود با موفقیت انجام شد",
+        token,
+      });
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-module.exports = { postSignUpCustomer };
+module.exports = { postSignUpCustomer, postLoginCustomer };

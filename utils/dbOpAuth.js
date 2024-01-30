@@ -1,7 +1,6 @@
 const configSql = require("../db/dbconfig");
 const sql = require("mssql");
 
-
 const signUpCustomer = async (values) => {
   console.log(values);
   try {
@@ -87,29 +86,46 @@ const loginCustomer = async (values) => {
   }
 };
 
-//login
+// app.post("/forgotpassword", async (req, res) => {
+//   const { codeMeli } = req.body;
 
-// app.post('/login', async (req, res) => {
-//     const { email, password } = req.body;
+//   try {
+//     // Check if the codeMeli exists in the database
+//     const userQuery = await pool
+//       .request()
+//       .input("codeMeli", sql.VarChar(255), codeMeli)
+//       .query("SELECT * FROM Users WHERE codeMeli = @codeMeli");
 
-//     try {
-//       const pool = await sql.connect(config); // Replace 'config' with your SQL Server connection configuration
-//       const result = await pool.request()
-//         .input('email', sql.VarChar(255), email)
-//         .input('password', sql.VarChar(255), password)
-//         .query('SELECT * FROM Users WHERE email = @email AND password = @password');
+//     const user = userQuery.recordset[0];
 
-//       if (result.recordset.length === 1) {
-//         // Login success
-//         res.status(200).json({ message: 'Login successful' });
-//       } else {
-//         // Login failed
-//         res.status(401).json({ message: 'Invalid email or password' });
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       res.status(500).json({ message: 'Internal Server Error' });
+//     if (!user) {
+//       // If the codeMeli does not exist, return an error response
+//       return res.status(404).json({ message: "کد ملی وارد شده معتبر نیست" });
 //     }
-//   });
+
+//     // Generate a new password or a password reset token get the password 
+//     const newPassword = generateNewPassword(); // You may implement your own logic to generate a new password or a password reset token
+
+//     // Update the user's password in the database
+//     const updatePasswordResult = await pool
+//       .request()
+//       .input("codeMeli", sql.VarChar(255), codeMeli)
+//       .input("newPassword", sql.VarChar(255), newPassword)
+//       .query(
+//         "UPDATE Users SET password = @newPassword WHERE codeMeli = @codeMeli"
+//       );
+
+//     // Send the new password to the user's email or phone number this nothind we make it
+//     sendPasswordResetEmail(user.email, newPassword); // You may implement your own logic to send the password reset email or SMS
+
+//     // Return a success response
+//     return res
+//       .status(200)
+//       .json({ message: "رمز عبور جدید به ایمیل یا شماره تلفن شما ارسال شد" });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({ message: "مشکلی در سرور رخ داده است" });
+//   }
+// });
 
 module.exports = { signUpCustomer, loginCustomer };

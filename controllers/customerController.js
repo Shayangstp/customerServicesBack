@@ -24,7 +24,6 @@ const postCustomersPerCompany = async (req, res) => {
 
 const postCustomersOrders = async (req, res) => {
   //40114
-  console.log(req.body);
   let reqbody = { ...req.body };
   try {
     dbOpCustomers.postCustomersOrders(reqbody.customerCode).then((result) => {
@@ -39,8 +38,6 @@ const postCustomerOrdersPerCompany = async (req, res) => {
   //40114 customercode
   //68 companyCode
   let reqbody = { ...req.body };
-  console.log("customerCode", reqbody.customerCode);
-  console.log("compnayCode", reqbody.companyCode);
   try {
     dbOpCustomers
       .postCustomersOrdersPerCompany(reqbody.customerCode, reqbody.companyCode)

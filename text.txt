@@ -1,6 +1,11 @@
 sh5262 sql 
 shayan
 
+automation.kavehglass.com
+s-golestani 
+sglp24
+
+
 //get --> all the orders from table
 
 

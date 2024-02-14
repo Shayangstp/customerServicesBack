@@ -69,7 +69,6 @@ const loginCustomer = async (values) => {
         "SELECT * FROM Users WHERE codeMeli = @codeMeli AND password = @password"
       );
 
-    console.log(result.recordset);
     if (result.recordset.length === 0) {
       // Login success
       const errorResult = {
@@ -103,7 +102,7 @@ const loginCustomer = async (values) => {
 //       return res.status(404).json({ message: "کد ملی وارد شده معتبر نیست" });
 //     }
 
-//     // Generate a new password or a password reset token get the password 
+//     // Generate a new password or a password reset token get the password
 //     const newPassword = generateNewPassword(); // You may implement your own logic to generate a new password or a password reset token
 
 //     // Update the user's password in the database

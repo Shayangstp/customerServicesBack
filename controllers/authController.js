@@ -2,7 +2,6 @@ const dbOpAuth = require("../utils/dbOpAuth");
 const jwt = require("jsonwebtoken");
 
 const postSignUpCustomer = async (req, res) => {
-  console.log(req.body);
   values = {};
   try {
     dbOpAuth.signUpCustomer(req.body).then((result) => {
@@ -16,7 +15,6 @@ const postSignUpCustomer = async (req, res) => {
   }
 };
 const postLoginCustomer = async (req, res) => {
-  console.log(req.body);
   try {
     dbOpAuth.loginCustomer(req.body).then((result) => {
       console.log(result);

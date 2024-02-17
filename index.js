@@ -25,6 +25,13 @@ router.use((req, res, next) => {
   next();
 });
 
+//get user ip
+app.get("/api/ip", (req, res) => {
+  const ip =
+    req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  res.json({ code: 200, ip });
+});
+
 app.listen(PORT, () =>
   console.log("server is listening on http://localhost:" + PORT)
 );
@@ -48,7 +55,3 @@ app.use("/api", companiesRoute);
 const productsRoute = require("./routers/productsRoute");
 app.use("/api", productsRoute);
 
-//db test table
-dbopration.getGalassWareOrders().then((result) => {
-  // console.log(result);
-});

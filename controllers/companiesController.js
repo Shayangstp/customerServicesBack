@@ -13,7 +13,6 @@ const getCompanies = async (req, res) => {
 
 const postCompaniesOrders = async (req, res) => {
   let reqbody = { ...req.body };
-  console.log(reqbody);
   try {
     dbOpCompanies
       .postCompaniesOrders(reqbody.companyCode, reqbody.userRole)
@@ -25,4 +24,30 @@ const postCompaniesOrders = async (req, res) => {
   }
 };
 
-module.exports = { getCompanies, postCompaniesOrders };
+const postActionOrders = async (req, res) => {
+  let reqbody = { ...req.body };
+  console.log(reqbody);
+  try {
+    dbOpCompanies
+      .postActionOrders(
+        reqbody.companyCode,
+        reqbody.exports,
+        reqbody.orderNo,
+        reqbody.userName,
+        reqbody.ipAddress,
+        reqbody.actionCode,
+        reqbody.comments
+      )
+      .then((result) => {
+        return res.json({
+          code: 200,
+          message: "action set successFully",
+          result,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = { getCompanies, postCompaniesOrders, postActionOrders };

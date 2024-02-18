@@ -43,11 +43,61 @@ const postCustomersOrdersPerCompany = async (customerCode, companyCode) => {
     let result = await pool
       .request()
       .input("customerCode", sql.Int, customerCode)
-      .input("companyCode", sql.Int, companyCode)
+      .input("companyCode", sql.NVarChar(50), companyCode)
       .execute("GetCustomerOrdersPerCompany");
+
+    // Fetch action names from the Actions table
+    let actionNamesQuery = await pool.query(
+      "SELECT ActionCode, ActionEnName, ActionFaName FROM Actions"
+    );
+
+    // Get the actions
+    let actionNames = {};
+    actionNamesQuery.recordset.forEach((row) => {
+      actionNames[row.ActionCode] = {
+        en: row.ActionEnName,
+        fa: row.ActionFaName,
+      };
+    });
+
+    // Fetch the latest action code and comments for each order
+    for (const order of result.recordset) {
+      let actions = await pool
+        .request()
+        .input("OrderNo", sql.Numeric, order.OrderNo)
+        .input("CompanyCode", sql.Int, order.CompanyCode)
+        .query(
+          "SELECT TOP 1 ActionCode, Comments FROM OrderActions WHERE OrderNo = @OrderNo AND CompanyCode = @CompanyCode ORDER BY ActionCode DESC"
+        );
+
+      if (actions.recordset.length > 0) {
+        const latestActionCode = actions.recordset[0].ActionCode;
+        const latestComments = actions.recordset[0].Comments;
+        order.latestActionCode = latestActionCode;
+
+        // Set statusEn, statusFa, and comments based on the latest action code
+        const actionName = actionNames[latestActionCode];
+        if (actionName) {
+          order.statusEn = actionName.en;
+          order.statusFa = actionName.fa;
+          order.comments = latestComments;
+        } else {
+          order.statusEn = "Unknown";
+          order.statusFa = "نامشخص";
+          order.comments = latestComments;
+        }
+      } else {
+        order.latestActionCode = null;
+        order.statusEn = "Unknown";
+        order.statusFa = "نامشخص";
+        order.comments = null;
+      }
+    }
+
     return result.recordset;
   } catch (error) {
     console.log(error);
+    throw error; // Rethrow the error for handling in the caller function
   }
 };
 

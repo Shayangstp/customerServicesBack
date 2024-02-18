@@ -42,7 +42,7 @@ const postCustomerOrdersPerCompany = async (req, res) => {
     dbOpCustomers
       .postCustomersOrdersPerCompany(reqbody.customerCode, reqbody.companyCode)
       .then((result) => {
-        if (reqbody.customerCode === "" || reqbody.companyCode === "") {
+        if (reqbody.customerCode === "") {
           return res.json({ code: 401, message: "req data is empty string" });
         } else {
           return res.json({ code: 200, customerOrdersPerCompany: result });

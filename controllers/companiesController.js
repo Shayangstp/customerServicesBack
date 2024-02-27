@@ -15,7 +15,7 @@ const postCompaniesOrders = async (req, res) => {
   let reqbody = { ...req.body };
   try {
     dbOpCompanies
-      .postCompaniesOrders(reqbody.companyCode, reqbody.userRole)
+      .postCompaniesOrders(reqbody.companyCode, reqbody.userID)
       .then((result) => {
         return res.json({ code: 200, companyOrders: result });
       });
@@ -36,7 +36,8 @@ const postActionOrders = async (req, res) => {
         reqbody.userName,
         reqbody.ipAddress,
         reqbody.actionCode,
-        reqbody.comments
+        reqbody.comments,
+        reqbody.toPerson
       )
       .then((result) => {
         return res.json({

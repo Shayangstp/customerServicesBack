@@ -26,13 +26,20 @@ const getCompanies = async () => {
 // };
 
 //get the actions from orderActions table and show to the user
-const postCompaniesOrders = async (companyCode, userRole) => {
+const postCompaniesOrders = async (companyCode, userID) => {
   try {
     let pool = await sql.connect(configSql);
+
+    //get user roles
+    const userQuery = await pool
+      .request()
+      .input("userID", sql.VarChar(100), userID)
+      .query("SELECT userId FROM Users WHERE UserId = @userID");
+    const userId = userQuery.recordset[0].userId;
+
     let products = await pool
       .request()
       .input("CompanyCode", sql.VarChar(100), companyCode)
-      .input("UserRole", sql.VarChar(100), userRole)
       .execute("GetCompanyOrders");
 
     // Fetch action names from the Actions table
@@ -56,34 +63,46 @@ const postCompaniesOrders = async (companyCode, userRole) => {
         .input("OrderNo", sql.Numeric, order.OrderNo)
         .input("CompanyCode", sql.Int, order.CompanyCode)
         .query(
-          "SELECT TOP 1 ActionCode, Comments FROM OrderActions WHERE OrderNo = @OrderNo AND CompanyCode = @CompanyCode ORDER BY ActionCode DESC"
+          "SELECT TOP 1 ActionCode, Comments , ToPerson FROM OrderActions WHERE OrderNo = @OrderNo AND CompanyCode = @CompanyCode ORDER BY ActionCode DESC"
         );
 
       if (actions.recordset.length > 0) {
+        console.log(actions.recordset[0]);
         const latestActionCode = actions.recordset[0].ActionCode;
         const latestComments = actions.recordset[0].Comments;
+        const lastToPerson = actions.recordset[0].ToPerson;
         order.latestActionCode = latestActionCode;
 
-        // Set statusEn, statusFa, and comments based on the latest action code
+        // Set statusEn, statusFa, toPerson , and comments based on the latest action code
         const actionName = actionNames[latestActionCode];
         if (actionName) {
           order.statusEn = actionName.en;
           order.statusFa = actionName.fa;
           order.comments = latestComments;
+          order.ToPerson = lastToPerson;
         } else {
           order.statusEn = "Unknown";
           order.statusFa = "نامشخص";
           order.comments = latestComments;
+          order.toPerson = lastToPerson;
         }
       } else {
         order.latestActionCode = null;
         order.statusEn = "Unknown";
         order.statusFa = "نامشخص";
         order.comments = null;
+        order.toPerson = "Unknown";
       }
     }
 
-    return products.recordset;
+    // console.log(products.recordset);
+    // console.log(userId);
+    const filteredOrders = products.recordset.filter(
+      (order) => order.ToPerson === userId
+    );
+
+    return filteredOrders;
+    // return products.recordset;
   } catch (error) {
     console.log("Error occurred while executing stored procedure:", error);
     console.log(error);
@@ -98,7 +117,8 @@ const postActionOrders = async (
   userName,
   ipAddress,
   actionCode,
-  comments
+  comments,
+  toPerson
 ) => {
   try {
     let pool = await sql.connect(configSql);
@@ -111,6 +131,7 @@ const postActionOrders = async (
       .input("IpAddress", sql.VarChar(100), ipAddress)
       .input("ActionCode", sql.Numeric, actionCode)
       .input("Comments", sql.NVarChar(100), comments)
+      .input("ToPerson", sql.NVarChar(100), toPerson)
       .execute(`SaveAction`);
 
     // Optionally, you may return something meaningful here if needed.

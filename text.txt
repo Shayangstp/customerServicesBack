@@ -1,5 +1,4 @@
-sh5262 sql 
-shayan
+
 
 automation.kavehglass.com
 s-golestani 

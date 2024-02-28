@@ -17,7 +17,6 @@ const postSignUpCustomer = async (req, res) => {
 const postLoginCustomer = async (req, res) => {
   try {
     dbOpAuth.loginCustomer(req.body).then((result) => {
-      console.log(result);
       if (result.code === 401) {
         return res.json({ code: 401, message: result.message });
       }

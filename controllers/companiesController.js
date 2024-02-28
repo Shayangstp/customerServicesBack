@@ -13,6 +13,7 @@ const getCompanies = async (req, res) => {
 
 const postCompaniesOrders = async (req, res) => {
   let reqbody = { ...req.body };
+
   try {
     dbOpCompanies
       .postCompaniesOrders(reqbody.companyCode, reqbody.userID)
@@ -50,5 +51,27 @@ const postActionOrders = async (req, res) => {
     console.log(error);
   }
 };
+const postSendCarDate = async (req, res) => {
+  let reqbody = { ...req.body };
+  console.log(reqbody);
+  try {
+    dbOpCompanies
+      .postSendCarDate(reqbody.orderNo, reqbody.sendCarDate)
+      .then((result) => {
+        return res.json({
+          code: 200,
+          message: "تاریخ ارسال ماشین با موفقیت ثبت شد",
+          result,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-module.exports = { getCompanies, postCompaniesOrders, postActionOrders };
+module.exports = {
+  getCompanies,
+  postCompaniesOrders,
+  postActionOrders,
+  postSendCarDate,
+};

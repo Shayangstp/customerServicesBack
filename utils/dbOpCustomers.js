@@ -92,6 +92,34 @@ const postCustomersOrdersPerCompany = async (customerCode, companyCode) => {
         order.statusFa = "نامشخص";
         order.comments = null;
       }
+      // Fetch sendCarDate from SendCar table
+      let sendCarDateQuery = await pool
+        .request()
+        .input("OrderNo", sql.Numeric, order.OrderNo)
+        .query("SELECT SendCarDate FROM SendCar WHERE OrderNo = @OrderNo");
+
+      if (sendCarDateQuery.recordset.length > 0) {
+        order.sendCarDate = sendCarDateQuery.recordset[0].SendCarDate;
+      } else {
+        order.sendCarDate = null; // If orderNo doesn't exist in SendCar table, set sendCarDate to null
+      }
+      // Fetch carDetail from SendCar table
+      let customerCarDetail = await pool
+        .request()
+        .input("OrderNo", sql.Numeric, order.OrderNo)
+        .query(
+          "SELECT Plate , Model , DriverName FROM CarDetail WHERE OrderNo = @OrderNo"
+        );
+
+      if (customerCarDetail.recordset.length > 0) {
+        order.carDetail = {
+          plate: customerCarDetail.recordset[0].Plate,
+          model: customerCarDetail.recordset[0].Model,
+          driverName: customerCarDetail.recordset[0].DriverName,
+        };
+      } else {
+        order.carDetail = null; // If orderNo doesn't exist in SendCar table, set sendCarDate to null
+      }
     }
 
     return result.recordset;
@@ -146,6 +174,34 @@ const postLocalCustomersPerCompany = async (companyCode) => {
   }
 };
 
+const postCustomerCarDetail = async (plate, model, driverName, orderNo) => {
+  try {
+    let pool = await sql.connect(configSql);
+    let request = await pool.request();
+
+    // Prepare the SQL query to insert data into SendCar table
+    const query = `
+      INSERT INTO CarDetail (Plate, Model, DriverName, OrderNo) 
+      VALUES (@Plate ,@Model ,@DriverName ,@OrderNo); 
+    `;
+
+    // Input parameters for the SQL query
+    request.input("Plate", sql.VarChar(50), plate);
+    request.input("DriverName", sql.VarChar(50), driverName);
+    request.input("Model", sql.VarChar(50), model);
+    request.input("OrderNo", sql.Int, orderNo);
+
+    // Execute the SQL query
+    await request.query(query);
+
+    // Optionally, you may return something meaningful here if needed.
+    return "Data successfully inserted into SendCar table.";
+  } catch (error) {
+    console.log("Error occurred while executing SQL query:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+};
+
 module.exports = {
   getCustomers,
   postCustomersOrders,
@@ -155,4 +211,5 @@ module.exports = {
   getLocalCustomers,
   postLocalCustomersPerCompany,
   postCustomersPerCompany,
+  postCustomerCarDetail,
 };

@@ -27,6 +27,7 @@ const getCompanies = async () => {
 
 //get the actions from orderActions table and show to the user
 const postCompaniesOrders = async (companyCode, userID) => {
+  console.log(companyCode);
   try {
     let pool = await sql.connect(configSql);
 
@@ -128,8 +129,8 @@ const postCompaniesOrders = async (companyCode, userID) => {
       (order) => order.ToPerson === userId
     );
 
-    // return filteredOrders;
-    return products.recordset;
+    return filteredOrders;
+    // return products.recordset;
   } catch (error) {
     console.log("Error occurred while executing stored procedure:", error);
     console.log(error);

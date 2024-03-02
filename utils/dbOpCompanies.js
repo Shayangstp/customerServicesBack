@@ -123,6 +123,23 @@ const postCompaniesOrders = async (companyCode, userID) => {
       } else {
         order.carDetail = null; // If orderNo doesn't exist in SendCar table, set sendCarDate to null
       }
+
+      let orderDelivered = await pool
+        .request()
+        .input("OrderNo", sql.Numeric, order.OrderNo)
+        .query(
+          "SELECT OrderNumbersAccepted , OrderLooksAccepted  FROM OrderDelivered WHERE OrderNo = @OrderNo"
+        );
+
+      if (orderDelivered.recordset.length > 0) {
+        order.orderDelivered = {
+          orderNumbersAccepted:
+            orderDelivered.recordset[0].OrderNumbersAccepted,
+          OrderLooksAccepted: orderDelivered.recordset[0].OrderLooksAccepted,
+        };
+      } else {
+        order.orderDelivered = null;
+      }
     }
 
     const filteredOrders = products.recordset.filter(

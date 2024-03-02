@@ -118,7 +118,23 @@ const postCustomersOrdersPerCompany = async (customerCode, companyCode) => {
           driverName: customerCarDetail.recordset[0].DriverName,
         };
       } else {
-        order.carDetail = null; // If orderNo doesn't exist in SendCar table, set sendCarDate to null
+        order.carDetail = null;
+      }
+      let orderDelivered = await pool
+        .request()
+        .input("OrderNo", sql.Numeric, order.OrderNo)
+        .query(
+          "SELECT OrderNumbersAccepted , OrderLooksAccepted  FROM OrderDelivered WHERE OrderNo = @OrderNo"
+        );
+
+      if (orderDelivered.recordset.length > 0) {
+        order.orderDelivered = {
+          orderNumbersAccepted:
+            orderDelivered.recordset[0].OrderNumbersAccepted,
+          OrderLooksAccepted: orderDelivered.recordset[0].OrderLooksAccepted,
+        };
+      } else {
+        order.orderDelivered = null;
       }
     }
 
@@ -174,21 +190,86 @@ const postLocalCustomersPerCompany = async (companyCode) => {
   }
 };
 
-const postCustomerCarDetail = async (plate, model, driverName, orderNo) => {
+//carDetail update and insert
+const postCustomerCarDetail = async (
+  plate,
+  model,
+  driverName,
+  orderNo,
+  date
+) => {
+  try {
+    let pool = await sql.connect(configSql);
+    let request = await pool.request();
+
+    // Check if the plate number already exists in the database
+    const checkQuery = `
+      SELECT COUNT(*) AS count FROM CarDetail WHERE OrderNo = @OrderNo;
+    `;
+
+    request.input("OrderNo", sql.Int, orderNo);
+
+    const result = await request.query(checkQuery);
+    const count = result.recordset[0].count;
+
+    if (count > 0) {
+      // If the plate number exists, update the existing record
+      const updateQuery = `
+        UPDATE CarDetail
+        SET Model = @Model, DriverName = @DriverName, Plate = @Plate, Date = @Date
+        WHERE OrderNo = @OrderNo;
+      `;
+
+      request.input("Model", sql.VarChar(50), model);
+      request.input("DriverName", sql.VarChar(50), driverName);
+      request.input("Plate", sql.VarChar(50), plate);
+      request.input("Date", sql.DateTime, date);
+
+      await request.query(updateQuery);
+
+      return "Data successfully updated in CarDetail table.";
+    } else {
+      // If the plate number doesn't exist, insert a new record
+      const insertQuery = `
+        INSERT INTO CarDetail (Plate, Model, DriverName, OrderNo , Date) 
+        VALUES (@Plate ,@Model ,@DriverName ,@OrderNo ,@Date); 
+      `;
+
+      request.input("Model", sql.VarChar(50), model);
+      request.input("DriverName", sql.VarChar(50), driverName);
+      request.input("Plate", sql.VarChar(50), plate);
+      request.input("Date", sql.DateTime, date);
+
+      await request.query(insertQuery);
+
+      return "Data successfully inserted into CarDetail table.";
+    }
+  } catch (error) {
+    console.log("Error occurred while executing SQL query:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+};
+
+const postOrderDelivered = async (
+  orderNumbersAccepted,
+  orderlooksAccepted,
+  date,
+  orderNo
+) => {
   try {
     let pool = await sql.connect(configSql);
     let request = await pool.request();
 
     // Prepare the SQL query to insert data into SendCar table
     const query = `
-      INSERT INTO CarDetail (Plate, Model, DriverName, OrderNo) 
-      VALUES (@Plate ,@Model ,@DriverName ,@OrderNo); 
+      INSERT INTO OrderDelivered (OrderNumbersAccepted, OrderLooksAccepted, date, OrderNo) 
+      VALUES (@OrderNumbersAccepted ,@OrderLooksAccepted ,@date ,@OrderNo); 
     `;
 
     // Input parameters for the SQL query
-    request.input("Plate", sql.VarChar(50), plate);
-    request.input("DriverName", sql.VarChar(50), driverName);
-    request.input("Model", sql.VarChar(50), model);
+    request.input("OrderNumbersAccepted", sql.Int, orderNumbersAccepted);
+    request.input("OrderLooksAccepted", sql.Int, orderlooksAccepted);
+    request.input("date", sql.DateTime, date);
     request.input("OrderNo", sql.Int, orderNo);
 
     // Execute the SQL query
@@ -212,4 +293,5 @@ module.exports = {
   postLocalCustomersPerCompany,
   postCustomersPerCompany,
   postCustomerCarDetail,
+  postOrderDelivered,
 };

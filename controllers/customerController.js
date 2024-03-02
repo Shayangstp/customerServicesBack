@@ -105,12 +105,34 @@ const postCustomerCarDetail = async (req, res) => {
         reqbody.plate,
         reqbody.model,
         reqbody.driverName,
-        reqbody.orderNo
+        reqbody.orderNo,
+        reqbody.date
       )
       .then((result) => {
         return res.json({
           code: 200,
           message: "مشخصات ماشین با موفقیت ثبت شد",
+          result,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
+const postOrderDelivered = async (req, res) => {
+  let reqbody = { ...req.body };
+  try {
+    dbOpCustomers
+      .postOrderDelivered(
+        reqbody.orderNumbersAccepted,
+        reqbody.orderlooksAccepted,
+        reqbody.date,
+        reqbody.orderNo
+      )
+      .then((result) => {
+        return res.json({
+          code: 200,
+          message: "اطلاعات با موفقیت ثبت شد",
           result,
         });
       });
@@ -129,4 +151,5 @@ module.exports = {
   postLocalCustomersPerCompany,
   postCustomersPerCompany,
   postCustomerCarDetail,
+  postOrderDelivered,
 };

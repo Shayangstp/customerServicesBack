@@ -24,9 +24,7 @@ router.post(
   "/getCustomersPerCompany",
   customerController.postCustomersPerCompany
 );
-router.post(
-  "/postCustomerCarDetail",
-  customerController.postCustomerCarDetail
-);
+router.post("/postCustomerCarDetail", customerController.postCustomerCarDetail);
+router.post("/postOrderDelivered", customerController.postOrderDelivered);
 
 module.exports = router;

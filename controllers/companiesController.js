@@ -31,13 +31,11 @@ const postActionOrders = async (req, res) => {
   try {
     dbOpCompanies
       .postActionOrders(
-        reqbody.companyCode,
-        reqbody.exports,
         reqbody.orderNo,
-        reqbody.userName,
+        reqbody.userId,
         reqbody.ipAddress,
         reqbody.actionCode,
-        reqbody.comments,
+        reqbody.comment,
         reqbody.toPerson
       )
       .then((result) => {

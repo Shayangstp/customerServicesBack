@@ -220,9 +220,9 @@ const postCustomerCarDetail = async (
         WHERE OrderNo = @OrderNo;
       `;
 
-      request.input("Model", sql.VarChar(50), model);
-      request.input("DriverName", sql.VarChar(50), driverName);
-      request.input("Plate", sql.VarChar(50), plate);
+      request.input("Model", sql.NVarChar(50), model);
+      request.input("DriverName", sql.NVarChar(50), driverName);
+      request.input("Plate", sql.NVarChar(50), plate);
       request.input("Date", sql.DateTime, date);
 
       await request.query(updateQuery);
@@ -235,9 +235,9 @@ const postCustomerCarDetail = async (
         VALUES (@Plate ,@Model ,@DriverName ,@OrderNo ,@Date); 
       `;
 
-      request.input("Model", sql.VarChar(50), model);
-      request.input("DriverName", sql.VarChar(50), driverName);
-      request.input("Plate", sql.VarChar(50), plate);
+      request.input("Model", sql.NVarChar(50), model);
+      request.input("DriverName", sql.NVarChar(50), driverName);
+      request.input("Plate", sql.NVarChar(50), plate);
       request.input("Date", sql.DateTime, date);
 
       await request.query(insertQuery);

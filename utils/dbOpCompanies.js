@@ -178,33 +178,27 @@ const postActionOrders = async (
   }
 };
 
-const postSendCarDate = async (orderNo, sendCarDate) => {
-  console.log(sendCarDate);
+const postOutputLog = async (values) => {
   try {
     let pool = await sql.connect(configSql);
     let request = await pool.request();
 
-    if (sendCarDate === null || sendCarDate === undefined) {
-      throw new Error("sendCarDate is null or undefined.");
-    }
+    // Input parameters for the stored procedure
+    request.input("OutputNo", sql.Int, values.outputNo);
+    request.input("OrderNo", sql.Int, values.orderNo);
+    request.input("CarModel", sql.NVarChar(50), values.carModel);
+    request.input("CarPlate", sql.NVarChar(10), values.carPlate);
+    request.input("DriverName", sql.NVarChar(100), values.driverName);
+    request.input("Date", sql.DateTime, values.date);
+    request.input("CarByCustomer", sql.Bit, values.carByCustomer);
 
-    // Prepare the SQL query to insert data into SendCar table
-    const query = `
-      INSERT INTO SendCar (OrderNo, SendCarDate)
-      VALUES (@OrderNo, @SendCarDate);
-    `;
-
-    // Input parameters for the SQL query
-    request.input("OrderNo", sql.Int, orderNo);
-    request.input("SendCarDate", sql.VarChar(100), sendCarDate);
-
-    // Execute the SQL query
-    await request.query(query);
+    // Execute the stored procedure
+    await request.execute("SaveOutputLog");
 
     // Optionally, you may return something meaningful here if needed.
-    return "Data successfully inserted into SendCar table.";
+    return "Data successfully inserted or updated in OutputLog table.";
   } catch (error) {
-    console.log("Error occurred while executing SQL query:", error);
+    console.log("Error occurred while executing stored procedure:", error);
     throw error; // Rethrow the error to handle it in the calling function
   }
 };
@@ -218,5 +212,5 @@ module.exports = {
   getCompanies,
   postCompaniesOrders,
   postActionOrders,
-  postSendCarDate,
+  postOutputLog,
 };

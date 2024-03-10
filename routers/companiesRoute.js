@@ -7,6 +7,6 @@ const companiesController = require("../controllers/companiesController");
 router.get("/getCompanies", companiesController.getCompanies);
 router.post("/postCompaniesOrders", companiesController.postCompaniesOrders);
 router.post("/postActionOrders", companiesController.postActionOrders);
-router.post("/postSendCarDate", companiesController.postSendCarDate);
+router.post("/postOutputLog", companiesController.postOutputLog);
 
 module.exports = router;

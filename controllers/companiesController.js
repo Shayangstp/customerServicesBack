@@ -49,19 +49,27 @@ const postActionOrders = async (req, res) => {
     console.log(error);
   }
 };
-const postSendCarDate = async (req, res) => {
+const postOutputLog = async (req, res) => {
   let reqbody = { ...req.body };
   console.log(reqbody);
+  const values = {
+    orderNo: reqbody.orderNo,
+    outputNo: reqbody.outputNo,
+    carModel: reqbody.carModel,
+    carPlate: reqbody.carPlate,
+    driverName: reqbody.driverName,
+    date: reqbody.date,
+    carByCustomer: reqbody.carByCustomer,
+  };
+  console.log(values);
   try {
-    dbOpCompanies
-      .postSendCarDate(reqbody.orderNo, reqbody.sendCarDate)
-      .then((result) => {
-        return res.json({
-          code: 200,
-          message: "تاریخ ارسال ماشین با موفقیت ثبت شد",
-          result,
-        });
+    dbOpCompanies.postOutputLog(values).then((result) => {
+      return res.json({
+        code: 200,
+        message: "اطلاعات با موفقیت ثبت شد",
+        result,
       });
+    });
   } catch (error) {
     console.log(error);
   }
@@ -71,5 +79,5 @@ module.exports = {
   getCompanies,
   postCompaniesOrders,
   postActionOrders,
-  postSendCarDate,
+  postOutputLog,
 };

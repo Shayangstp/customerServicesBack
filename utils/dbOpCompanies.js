@@ -26,125 +26,33 @@ const getCompanies = async () => {
 // };
 
 //get the actions from orderActions table and show to the user
-const postCompaniesOrders = async (companyCode, userID) => {
+const postCompaniesOrders = async (
+  companyCode,
+  userID,
+  pageNumber,
+  pageSize
+) => {
+  console.log(companyCode, userID, pageNumber, pageSize);
   try {
     let pool = await sql.connect(configSql);
-
+    console.log(companyCode, userID, pageNumber, pageSize);
     let products = await pool
       .request()
       .input("CompanyCode", sql.VarChar(100), companyCode)
-      //user id id user login
-      // .input("CompanyCode", sql.VarChar(100), companyCode)
+      .input("PageNumber", sql.Int, pageNumber)
+      .input("PageSize", sql.Int, pageSize)
+      .output("TotalCount", sql.Int)
       .execute("GetCompanyOrders");
 
-    // Fetch action names from the Actions table
-    // let actionNamesQuery = await pool.query(
-    //   "SELECT ActionCode, ActionEnName, ActionFaName FROM Actions"
-    // );
-
-    // // Get the actions
-    // let actionNames = {};
-    // actionNamesQuery.recordset.forEach((row) => {
-    //   actionNames[row.ActionCode] = {
-    //     en: row.ActionEnName,
-    //     fa: row.ActionFaName,
-    //   };
-    // });
-
-    // Fetch the latest action code and comments for each order
-    // for (const order of products.recordset) {
-    //   let actions = await pool
-    //     .request()
-    //     .input("OrderNo", sql.Numeric, order.OrderNo)
-    //     .input("CompanyCode", sql.Int, order.CompanyCode)
-    //     .query(
-    //       "SELECT TOP 1 ActionCode, Comments , ToPerson FROM OrderActions WHERE OrderNo = @OrderNo AND CompanyCode = @CompanyCode ORDER BY ActionCode DESC"
-    //     );
-
-    //   if (actions.recordset.length > 0) {
-    //     const latestActionCode = actions.recordset[0].ActionCode;
-    //     const latestComments = actions.recordset[0].Comments;
-    //     const lastToPerson = actions.recordset[0].ToPerson;
-    //     order.latestActionCode = latestActionCode;
-
-    //     // Set statusEn, statusFa, toPerson , and comments based on the latest action code
-    //     const actionName = actionNames[latestActionCode];
-    //     if (actionName) {
-    //       order.statusEn = actionName.en;
-    //       order.statusFa = actionName.fa;
-    //       order.comments = latestComments;
-    //       order.toPerson = lastToPerson;
-    //     } else {
-    //       order.statusEn = "Unknown";
-    //       order.statusFa = "نامشخص";
-    //       order.comments = latestComments;
-    //       order.toPerson = lastToPerson;
-    //     }
-    //   } else {
-    //     order.latestActionCode = null;
-    //     order.statusEn = "Unknown";
-    //     order.statusFa = "نامشخص";
-    //     order.comments = null;
-    //     order.toPerson = "Unknown";
-    //   }
-
-    //   // Fetch sendCarDate from SendCar table
-    //   let sendCarDateQuery = await pool
-    //     .request()
-    //     .input("OrderNo", sql.Numeric, order.OrderNo)
-    //     .query("SELECT SendCarDate FROM SendCar WHERE OrderNo = @OrderNo");
-
-    //   if (sendCarDateQuery.recordset.length > 0) {
-    //     order.sendCarDate = sendCarDateQuery.recordset[0].SendCarDate;
-    //   } else {
-    //     order.sendCarDate = null; // If orderNo doesn't exist in SendCar table, set sendCarDate to null
-    //   }
-
-    //   // Fetch carDetail from SendCar table
-    //   let customerCarDetail = await pool
-    //     .request()
-    //     .input("OrderNo", sql.Numeric, order.OrderNo)
-    //     .query(
-    //       "SELECT Plate , Model , DriverName FROM CarDetail WHERE OrderNo = @OrderNo"
-    //     );
-
-    //   if (customerCarDetail.recordset.length > 0) {
-    //     order.carDetail = {
-    //       plate: customerCarDetail.recordset[0].Plate,
-    //       model: customerCarDetail.recordset[0].Model,
-    //       driverName: customerCarDetail.recordset[0].DriverName,
-    //     };
-    //   } else {
-    //     order.carDetail = null; // If orderNo doesn't exist in SendCar table, set sendCarDate to null
-    //   }
-
-    //   let orderDelivered = await pool
-    //     .request()
-    //     .input("OrderNo", sql.Numeric, order.OrderNo)
-    //     .query(
-    //       "SELECT OrderNumbersAccepted , OrderLooksAccepted  FROM OrderDelivered WHERE OrderNo = @OrderNo"
-    //     );
-
-    //   if (orderDelivered.recordset.length > 0) {
-    //     order.orderDelivered = {
-    //       orderNumbersAccepted:
-    //         orderDelivered.recordset[0].OrderNumbersAccepted,
-    //       OrderLooksAccepted: orderDelivered.recordset[0].OrderLooksAccepted,
-    //     };
-    //   } else {
-    //     order.orderDelivered = null;
-    //   }
-    // }
-
-    // const filteredOrders = products.recordset.filter(
-    //   (order) => order.toPerson === userId
-    // );
-
-    // return filteredOrders;
-    return products.recordset;
+    const totalCount = products.output.TotalCount;
+    products.recordset;
+    return {
+      totalCount,
+      products: products.recordset,
+    };
   } catch (error) {
     console.log("Error occurred while executing stored procedure:", error);
-    console.log(error);
+    throw error;
   }
 };
 

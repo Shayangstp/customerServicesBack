@@ -28,27 +28,50 @@ const getCompanies = async () => {
 //get the actions from orderActions table and show to the user
 const postCompaniesOrders = async (
   companyCode,
-  userID,
+  userId,
   pageNumber,
   pageSize
 ) => {
-  console.log(companyCode, userID, pageNumber, pageSize);
   try {
     let pool = await sql.connect(configSql);
-    console.log(companyCode, userID, pageNumber, pageSize);
-    let products = await pool
+    // Execute the stored procedure GetCompanyOrders
+    let productsResult = await pool
       .request()
-      .input("CompanyCode", sql.VarChar(100), companyCode)
+      .input("CompanyCode", sql.Int, companyCode)
       .input("PageNumber", sql.Int, pageNumber)
       .input("PageSize", sql.Int, pageSize)
+      .input("UserId", sql.VarChar(100), userId)
       .output("TotalCount", sql.Int)
       .execute("GetCompanyOrders");
 
-    const totalCount = products.output.TotalCount;
-    products.recordset;
+    const totalCount = productsResult.output.TotalCount;
+    const products = productsResult.recordset;
+
+    // Array to store output log for each order
+    let ordersWithOutputLog = [];
+
+    // Loop through each order
+    for (let order of products) {
+      // Execute the stored procedure GetOutputLog for each order
+      let outputLogResult = await pool
+        .request()
+        .input("OrderNo", sql.Int, order.OrderNo)
+        .execute("GetOutputLog");
+
+      let outputLog =
+        outputLogResult.recordset.length > 0
+          ? outputLogResult.recordset[0]
+          : null;
+      // Add the output log to the order object
+      order.outputLog = outputLog;
+
+      // Push the order with output log to the result array
+      ordersWithOutputLog.push(order);
+    }
+
     return {
       totalCount,
-      products: products.recordset,
+      products: ordersWithOutputLog,
     };
   } catch (error) {
     console.log("Error occurred while executing stored procedure:", error);

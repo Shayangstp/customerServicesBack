@@ -14,12 +14,11 @@ const getCompanies = async (req, res) => {
 const postCompaniesOrders = async (req, res) => {
   let reqbody = { ...req.body };
   let reqParam = { ...req.params };
-  console.log(reqParam);
   try {
     dbOpCompanies
       .postCompaniesOrders(
         reqbody.companyCode,
-        reqbody.userID,
+        reqbody.userId,
         reqParam.pageNumber,
         reqParam.pageSize
       )
